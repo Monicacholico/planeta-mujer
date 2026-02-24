@@ -24,14 +24,16 @@ function hourglassPath(w, h) {
 }
 
 let fillScale;
+const centerYOffset = HEIGHT / 2 + 10;
 
 function fillY(minutes) {
     const frac = fillScale(minutes);
-    return HG_HEIGHT / 2 - frac * HG_HEIGHT;
+    return centerYOffset + HG_HEIGHT / 2 - frac * HG_HEIGHT;
 }
 
 function fillH(minutes) {
-    return HG_HEIGHT / 2 - fillY(minutes) + HG_HEIGHT / 2;
+    const frac = fillScale(minutes);
+    return frac * HG_HEIGHT;
 }
 
 
@@ -95,32 +97,45 @@ d3.csv("data/time-use.csv", d3.autoType).then(data => {
         const menX = WIDTH / 2 + GAP / 2 + HG_WIDTH / 2;
         const centerY = HEIGHT / 2 + 10;
 
-        const clipIdW = `clip-w-${catIdx}`;
-        const clipIdM = `clip-m-${catIdx}`;
+        const maskIdW = `mask-w-${catIdx}`;
+        const maskIdM = `mask-m-${catIdx}`;
 
         const defs = svg.append("defs");
-        defs.append("clipPath")
-            .attr("id", clipIdW)
+        defs.append("mask")
+            .attr("id", maskIdW)
             .append("path")
-            .attr("d", outline);
-        defs.append("clipPath")
-            .attr("id", clipIdM)
+            .attr("d", outline)
+            .attr("fill", "white")
+            .attr("transform", `translate(${womenX}, ${centerY})`);
+        defs.append("mask")
+            .attr("id", maskIdM)
             .append("path")
-            .attr("d", outline);
+            .attr("d", outline)
+            .attr("fill", "white")
+            .attr("transform", `translate(${menX}, ${centerY})`);
 
-        // Women hourglass group
+        // Women fill — masked by hourglass shape
+        svg.append("rect")
+            .attr("class", "hourglass-fill hourglass-fill-women")
+            .attr("mask", `url(#${maskIdW})`)
+            .attr("x", womenX - HG_WIDTH / 2)
+            .attr("width", HG_WIDTH)
+            .attr("y", centerY + HG_HEIGHT / 2)
+            .attr("height", 0);
+
+        // Men fill — masked by hourglass shape
+        svg.append("rect")
+            .attr("class", "hourglass-fill hourglass-fill-men")
+            .attr("mask", `url(#${maskIdM})`)
+            .attr("x", menX - HG_WIDTH / 2)
+            .attr("width", HG_WIDTH)
+            .attr("y", centerY + HG_HEIGHT / 2)
+            .attr("height", 0);
+
+        // Women hourglass group — outline and label
         const gWomen = svg.append("g")
             .attr("class", "hourglass-group-women")
             .attr("transform", `translate(${womenX}, ${centerY})`);
-
-        gWomen.append("g")
-            .attr("clip-path", `url(#${clipIdW})`)
-            .append("rect")
-            .attr("class", "hourglass-fill hourglass-fill-women")
-            .attr("x", -HG_WIDTH / 2)
-            .attr("width", HG_WIDTH)
-            .attr("y", HG_HEIGHT / 2)
-            .attr("height", 0);
 
         gWomen.append("path")
             .attr("class", "hourglass-outline")
@@ -131,19 +146,10 @@ d3.csv("data/time-use.csv", d3.autoType).then(data => {
             .attr("y", HG_HEIGHT / 2 + 24)
             .text("Women");
 
-        // Men hourglass group
+        // Men hourglass group — outline and label
         const gMen = svg.append("g")
             .attr("class", "hourglass-group-men")
             .attr("transform", `translate(${menX}, ${centerY})`);
-
-        gMen.append("g")
-            .attr("clip-path", `url(#${clipIdM})`)
-            .append("rect")
-            .attr("class", "hourglass-fill hourglass-fill-men")
-            .attr("x", -HG_WIDTH / 2)
-            .attr("width", HG_WIDTH)
-            .attr("y", HG_HEIGHT / 2)
-            .attr("height", 0);
 
         gMen.append("path")
             .attr("class", "hourglass-outline")
