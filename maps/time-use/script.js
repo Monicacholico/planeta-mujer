@@ -95,20 +95,28 @@ d3.csv("data/time-use.csv", d3.autoType).then(data => {
         const menX = WIDTH / 2 + GAP / 2 + HG_WIDTH / 2;
         const centerY = HEIGHT / 2 + 10;
 
+        const clipIdW = `clip-w-${catIdx}`;
+        const clipIdM = `clip-m-${catIdx}`;
+
+        const defs = svg.append("defs");
+        defs.append("clipPath")
+            .attr("id", clipIdW)
+            .append("path")
+            .attr("d", outline);
+        defs.append("clipPath")
+            .attr("id", clipIdM)
+            .append("path")
+            .attr("d", outline);
+
         // Women hourglass group
         const gWomen = svg.append("g")
             .attr("class", "hourglass-group-women")
             .attr("transform", `translate(${womenX}, ${centerY})`);
 
-        const clipIdW = `clip-w-${catIdx}`;
-        gWomen.append("clipPath")
-            .attr("id", clipIdW)
-            .append("path")
-            .attr("d", outline);
-
-        gWomen.append("rect")
-            .attr("class", "hourglass-fill hourglass-fill-women")
+        gWomen.append("g")
             .attr("clip-path", `url(#${clipIdW})`)
+            .append("rect")
+            .attr("class", "hourglass-fill hourglass-fill-women")
             .attr("x", -HG_WIDTH / 2)
             .attr("width", HG_WIDTH)
             .attr("y", HG_HEIGHT / 2)
@@ -128,15 +136,10 @@ d3.csv("data/time-use.csv", d3.autoType).then(data => {
             .attr("class", "hourglass-group-men")
             .attr("transform", `translate(${menX}, ${centerY})`);
 
-        const clipIdM = `clip-m-${catIdx}`;
-        gMen.append("clipPath")
-            .attr("id", clipIdM)
-            .append("path")
-            .attr("d", outline);
-
-        gMen.append("rect")
-            .attr("class", "hourglass-fill hourglass-fill-men")
+        gMen.append("g")
             .attr("clip-path", `url(#${clipIdM})`)
+            .append("rect")
+            .attr("class", "hourglass-fill hourglass-fill-men")
             .attr("x", -HG_WIDTH / 2)
             .attr("width", HG_WIDTH)
             .attr("y", HG_HEIGHT / 2)
