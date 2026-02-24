@@ -1,0 +1,175 @@
+/* ── Piece header (back link + title) ── */
+
+.piece-header {
+    padding: calc(var(--nav-height) + 2rem) 0 1rem;
+    text-align: center;
+}
+
+.piece-header h1 {
+    font-size: clamp(1.4rem, 3vw, 1.8rem);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    margin-bottom: 0.4rem;
+}
+
+.back-link {
+    display: inline-block;
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+    margin-bottom: 1rem;
+}
+
+.back-link:hover {
+    color: var(--color-white);
+}
+
+.subtitle {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin-top: 0.4rem;
+}
+
+/* ── Scrollytelling layout ── */
+
+.scrolly {
+    position: relative;
+    display: flex;
+}
+
+.sticky-map {
+    position: sticky;
+    top: 0;
+    flex: 0 0 62%;
+    height: 100vh;
+    align-self: flex-start;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sticky-map svg {
+    width: 95%;
+    height: 85%;
+    display: block;
+    overflow: visible;
+}
+
+.steps {
+    flex: 0 0 33%;
+    margin-left: 2%;
+    padding-top: 40vh;
+    padding-bottom: 60vh;
+    position: relative;
+    z-index: 10;
+}
+
+.step {
+    margin-bottom: 70vh;
+    padding: 1.4rem 1.6rem;
+    background: rgba(20, 23, 34, 0.88);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    backdrop-filter: blur(6px);
+    opacity: 0.3;
+    transition: opacity 0.4s ease;
+}
+
+.step.is-active {
+    opacity: 1;
+}
+
+.step h2 {
+    font-family: var(--font-body);
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--color-white);
+}
+
+.step p {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+}
+
+.step-stats {
+    margin-top: 0.8rem;
+    font-size: 0.8rem;
+    line-height: 1.7;
+    color: #c0c4d0;
+}
+
+.step-stats .stat-label { color: var(--color-text-muted); }
+.step-stats .stat-value { color: #f0c040; font-weight: 600; }
+.step-stats .stat-best { color: #4ecb71; }
+.step-stats .stat-worst { color: #e05555; }
+
+/* ── Map elements ── */
+
+.country {
+    fill: #2a3a4a;
+    stroke: var(--color-bg);
+    stroke-width: 0.4;
+}
+
+.bubble {
+    stroke: #fff;
+    stroke-width: 0.4;
+    cursor: pointer;
+}
+
+.bubble:hover {
+    stroke-width: 1.5;
+}
+
+/* ── Tooltip ── */
+
+#tooltip {
+    position: fixed;
+    pointer-events: none;
+    background: rgba(20, 23, 34, 0.95);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 100;
+    max-width: 240px;
+}
+
+#tooltip .country-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+}
+
+#tooltip .score {
+    color: #f0c040;
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 768px) {
+    .scrolly {
+        flex-direction: column;
+    }
+
+    .sticky-map {
+        flex: none;
+        width: 100%;
+        height: 50vh;
+    }
+
+    .steps {
+        flex: none;
+        width: 90%;
+        margin: 0 auto;
+        padding-top: 10vh;
+    }
+
+    .step {
+        margin-bottom: 50vh;
+    }
+}

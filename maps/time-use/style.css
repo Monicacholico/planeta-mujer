@@ -1,0 +1,198 @@
+/* ── Piece header ── */
+
+.piece-header {
+    padding: calc(var(--nav-height) + 2rem) 0 1rem;
+    text-align: center;
+    background: linear-gradient(180deg, var(--color-bg-alt) 0%, var(--color-bg) 100%);
+}
+
+.piece-header h1 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 300;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.6rem;
+}
+
+.back-link {
+    display: inline-block;
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+    margin-bottom: 1rem;
+}
+
+.back-link:hover {
+    color: var(--color-white);
+}
+
+.subtitle {
+    font-size: 1.05rem;
+    color: var(--color-text-muted);
+    max-width: 560px;
+    margin: 0 auto;
+}
+
+.source {
+    margin-top: 1.5rem;
+    font-size: 0.8rem;
+    color: var(--color-text-subtle);
+}
+
+/* ── Sections ── */
+
+.category-section {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    border-top: 1px solid var(--color-border);
+    opacity: 0.3;
+    transition: opacity 0.6s ease;
+}
+
+.category-section.is-active {
+    opacity: 1;
+}
+
+.section-inner {
+    display: flex;
+    gap: 3rem;
+    max-width: 1100px;
+    width: 100%;
+    align-items: flex-start;
+}
+
+/* ── Country list ── */
+
+.country-list {
+    flex: 0 0 180px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 0.78rem;
+    position: sticky;
+    top: calc(var(--nav-height) + 1rem);
+    max-height: calc(100vh - var(--nav-height) - 2rem);
+    overflow-y: auto;
+}
+
+.country-item {
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    transition: background 0.2s, color 0.2s;
+    white-space: nowrap;
+}
+
+.country-item:hover,
+.country-item.is-active {
+    background: var(--color-bg-card);
+    color: var(--color-white);
+}
+
+.country-item.is-active {
+    background: var(--color-bg-card-hover);
+    font-weight: 600;
+}
+
+/* ── Viz area ── */
+
+.viz-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.viz-area h2 {
+    font-size: 1.8rem;
+    font-weight: 400;
+    margin-bottom: 0.5rem;
+}
+
+.section-desc {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    max-width: 440px;
+    margin-bottom: 2rem;
+}
+
+.hourglass-container {
+    width: 100%;
+    max-width: 500px;
+}
+
+.hourglass-container svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.data-label {
+    display: flex;
+    gap: 3rem;
+    margin-top: 1.5rem;
+    font-size: 0.95rem;
+}
+
+.label-women { color: var(--color-accent); }
+.label-men { color: var(--color-accent-alt); }
+.val-women, .val-men { font-size: 1.3rem; }
+
+.country-name-display {
+    margin-top: 0.8rem;
+    font-size: 0.85rem;
+    color: var(--color-text-subtle);
+    font-style: italic;
+}
+
+/* ── Hourglass SVG ── */
+
+.hourglass-outline {
+    fill: none;
+    stroke: var(--color-border);
+    stroke-width: 2;
+}
+
+.hourglass-fill-women {
+    fill: var(--color-accent);
+    opacity: 0.6;
+}
+
+.hourglass-fill-men {
+    fill: var(--color-accent-alt);
+    opacity: 0.6;
+}
+
+.hourglass-label {
+    font-size: 14px;
+    fill: var(--color-text-muted);
+    text-anchor: middle;
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 768px) {
+    .section-inner {
+        flex-direction: column-reverse;
+        align-items: center;
+    }
+
+    .country-list {
+        flex: none;
+        position: static;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        max-height: none;
+        gap: 4px;
+    }
+
+    .data-label {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: center;
+    }
+}

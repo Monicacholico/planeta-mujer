@@ -1,0 +1,12 @@
+# Raw data files (large Excel files not needed at runtime)
+data/raw/
+*/data/raw/
+*/*/data/raw/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/

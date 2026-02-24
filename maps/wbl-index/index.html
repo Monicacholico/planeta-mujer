@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-7GNCKDG9RE"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-7GNCKDG9RE');</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WBL Gender Equality Index — Planeta Mujer</title>
+    <link rel="stylesheet" href="../../shared/css/base.css">
+    <link rel="stylesheet" href="../../shared/css/components.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/scrollama@3"></script>
+</head>
+<body>
+
+    <nav class="site-nav" aria-label="Main navigation">
+        <div class="nav-inner">
+            <a href="../../index.html" class="nav-logo">Planeta Mujer</a>
+            <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">&#9776;</button>
+            <ul class="nav-links">
+                <li><a href="../index.html" class="is-active">Maps</a></li>
+                <li><a href="../../biographies/index.html">Biographies</a></li>
+                <li><a href="../../articles/index.html">Articles</a></li>
+                <li><a href="../../organizations/index.html">Organizations</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header class="piece-header">
+        <div class="container">
+            <a href="../index.html" class="back-link">&larr; Back to Maps</a>
+            <h1>Women, Business and the Law Index</h1>
+            <p class="subtitle">Scroll to explore gender equality scores across regions. Data: World Bank, 2024.</p>
+        </div>
+    </header>
+
+    <div class="scrolly">
+        <div class="sticky-map" id="map-container"></div>
+
+        <div class="steps">
+            <div class="step is-active" data-region="world">
+                <h2>Global Overview</h2>
+                <p>The WBL index scores 190 economies on laws affecting women's economic opportunity, from 0 (most restrictive) to 100 (full equality).</p>
+                <div class="step-stats"></div>
+            </div>
+
+            <div class="step" data-region="americas">
+                <h2>Americas</h2>
+                <p>From Canada's near-perfect score to ongoing challenges in Central America, the hemisphere shows wide variation in legal gender equality.</p>
+                <div class="step-stats"></div>
+            </div>
+
+            <div class="step" data-region="europe">
+                <h2>Europe</h2>
+                <p>Western and Northern Europe lead globally, but Eastern Europe and Central Asia show a more mixed picture.</p>
+                <div class="step-stats"></div>
+            </div>
+
+            <div class="step" data-region="africa">
+                <h2>Africa &amp; Middle East</h2>
+                <p>The region with the widest range — from emerging reformers to economies where women face the most legal barriers.</p>
+                <div class="step-stats"></div>
+            </div>
+
+            <div class="step" data-region="south-asia">
+                <h2>South &amp; Southeast Asia</h2>
+                <p>A rapidly reforming region — from India's recent legal updates to emerging economies in Southeast Asia.</p>
+                <div class="step-stats"></div>
+            </div>
+
+            <div class="step" data-region="east-asia">
+                <h2>East Asia &amp; Oceania</h2>
+                <p>Australia and New Zealand score among the highest globally, while East Asian economies show a wide range.</p>
+                <div class="step-stats"></div>
+            </div>
+
+            <div class="step" data-region="world">
+                <h2>The Full Picture</h2>
+                <p>Zooming back out — the global gap between the highest and lowest scoring economies remains substantial.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="tooltip"></div>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-brand">Planeta Mujer</div>
+            <ul class="footer-links">
+                <li><a href="../index.html">Maps</a></li>
+                <li><a href="../../biographies/index.html">Biographies</a></li>
+                <li><a href="../../articles/index.html">Articles</a></li>
+                <li><a href="../../organizations/index.html">Organizations</a></li>
+            </ul>
+            <p class="footer-copy">&copy; 2012-2026 Planeta Mujer. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="../../shared/js/nav.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
