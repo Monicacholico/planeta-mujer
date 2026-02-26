@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /data/raw/
+
+Sitemap: https://www.planeta-mujer.org/sitemap.xml
