@@ -1,0 +1,366 @@
+{
+  "name": "Feminist Thought",
+  "children": [
+    {
+      "name": "Liberal Feminism",
+      "children": [
+        {
+          "name": "Mary Wollstonecraft",
+          "children": [
+            { "name": "A Vindication of the Rights of Woman", "year": 1792 },
+            { "name": "Thoughts on the Education of Daughters", "year": 1787 }
+          ]
+        },
+        {
+          "name": "John Stuart Mill",
+          "children": [
+            { "name": "The Subjection of Women", "year": 1869 }
+          ]
+        },
+        {
+          "name": "Betty Friedan",
+          "children": [
+            { "name": "The Feminine Mystique", "year": 1963 },
+            { "name": "The Second Stage", "year": 1981 }
+          ]
+        },
+        {
+          "name": "Martha Nussbaum",
+          "children": [
+            { "name": "Sex and Social Justice", "year": 1999 },
+            { "name": "Women and Human Development", "year": 2000 }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Radical Feminism",
+      "children": [
+        {
+          "name": "Simone de Beauvoir",
+          "children": [
+            { "name": "The Second Sex", "year": 1949 },
+            { "name": "The Ethics of Ambiguity", "year": 1947 }
+          ]
+        },
+        {
+          "name": "Kate Millett",
+          "children": [
+            { "name": "Sexual Politics", "year": 1970 }
+          ]
+        },
+        {
+          "name": "Shulamith Firestone",
+          "children": [
+            { "name": "The Dialectic of Sex", "year": 1970 }
+          ]
+        },
+        {
+          "name": "Andrea Dworkin",
+          "children": [
+            { "name": "Woman Hating", "year": 1974 },
+            { "name": "Pornography: Men Possessing Women", "year": 1981 }
+          ]
+        },
+        {
+          "name": "Catharine MacKinnon",
+          "children": [
+            { "name": "Toward a Feminist Theory of the State", "year": 1989 }
+          ]
+        },
+        {
+          "name": "Marcela Lagarde",
+          "children": [
+            { "name": "Los cautiverios de las mujeres", "year": 1990 }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Marxist & Socialist Feminism",
+      "children": [
+        {
+          "name": "Alexandra Kollontai",
+          "children": [
+            { "name": "The Social Bases of the Woman Question", "year": 1909 }
+          ]
+        },
+        {
+          "name": "Silvia Federici",
+          "children": [
+            { "name": "Caliban and the Witch", "year": 2004 },
+            { "name": "Wages Against Housework", "year": 1975 }
+          ]
+        },
+        {
+          "name": "Heidi Hartmann",
+          "children": [
+            { "name": "The Unhappy Marriage of Marxism and Feminism", "year": 1979 }
+          ]
+        },
+        {
+          "name": "Nancy Fraser",
+          "children": [
+            { "name": "Fortunes of Feminism", "year": 2013 },
+            { "name": "Feminism for the 99%", "year": 2019 }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Intersectional Feminism",
+      "children": [
+        {
+          "name": "Black Feminism",
+          "children": [
+            {
+              "name": "bell hooks",
+              "children": [
+                { "name": "Ain't I a Woman?", "year": 1981 },
+                { "name": "Feminist Theory: From Margin to Center", "year": 1984 },
+                { "name": "All About Love", "year": 2000 }
+              ]
+            },
+            {
+              "name": "Audre Lorde",
+              "children": [
+                { "name": "Sister Outsider", "year": 1984 },
+                { "name": "The Master's Tools Will Never Dismantle the Master's House", "year": 1979 }
+              ]
+            },
+            {
+              "name": "Kimberlé Crenshaw",
+              "children": [
+                { "name": "Demarginalizing the Intersection of Race and Sex", "year": 1989 }
+              ]
+            },
+            {
+              "name": "Angela Davis",
+              "children": [
+                { "name": "Women, Race & Class", "year": 1981 },
+                { "name": "Freedom Is a Constant Struggle", "year": 2016 }
+              ]
+            },
+            {
+              "name": "Patricia Hill Collins",
+              "children": [
+                { "name": "Black Feminist Thought", "year": 1990 }
+              ]
+            },
+            {
+              "name": "Ochy Curiel",
+              "children": [
+                { "name": "La Nación Heterosexual", "year": 2013 }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Chicana Feminism",
+          "children": [
+            {
+              "name": "Gloria Anzaldúa",
+              "children": [
+                { "name": "Borderlands/La Frontera", "year": 1987 },
+                { "name": "This Bridge Called My Back", "year": 1981 }
+              ]
+            },
+            {
+              "name": "Cherríe Moraga",
+              "children": [
+                { "name": "Loving in the War Years", "year": 1983 }
+              ]
+            },
+            {
+              "name": "Ana Castillo",
+              "children": [
+                { "name": "Massacre of the Dreamers", "year": 1994 }
+              ]
+            },
+            {
+              "name": "Emma Pérez",
+              "children": [
+                { "name": "The Decolonial Imaginary", "year": 1999 }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Decolonial Feminism",
+          "children": [
+            {
+              "name": "María Lugones",
+              "children": [
+                { "name": "Pilgrimages/Peregrinajes", "year": 2003 }
+              ]
+            },
+            {
+              "name": "Rita Laura Segato",
+              "children": [
+                { "name": "Las estructuras elementales de la violencia", "year": 2003 }
+              ]
+            },
+            {
+              "name": "Lélia Gonzalez",
+              "children": [
+                { "name": "Racismo e Sexismo na Cultura Brasileira", "year": 1984 }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Queer Feminism",
+          "children": [
+            {
+              "name": "Judith Butler",
+              "children": [
+                { "name": "Gender Trouble", "year": 1990 },
+                { "name": "Bodies That Matter", "year": 1993 }
+              ]
+            },
+            {
+              "name": "Adrienne Rich",
+              "children": [
+                { "name": "Compulsory Heterosexuality and Lesbian Existence", "year": 1980 }
+              ]
+            },
+            {
+              "name": "Monique Wittig",
+              "children": [
+                { "name": "One Is Not Born a Woman", "year": 1981 },
+                { "name": "The Straight Mind", "year": 1992 }
+              ]
+            },
+            {
+              "name": "Virginie Despentes",
+              "children": [
+                { "name": "Baise-moi", "year": 1994 },
+                { "name": "King Kong Theory", "year": 2006 }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Postcolonial Feminism",
+      "children": [
+        {
+          "name": "Gayatri Chakravorty Spivak",
+          "children": [
+            { "name": "Can the Subaltern Speak?", "year": 1988 }
+          ]
+        },
+        {
+          "name": "Chandra Talpade Mohanty",
+          "children": [
+            { "name": "Under Western Eyes", "year": 1984 },
+            { "name": "Feminism Without Borders", "year": 2003 }
+          ]
+        },
+        {
+          "name": "Trinh T. Minh-ha",
+          "children": [
+            { "name": "Woman, Native, Other", "year": 1989 }
+          ]
+        },
+        {
+          "name": "Sara Ahmed",
+          "children": [
+            { "name": "Living a Feminist Life", "year": 2017 },
+            { "name": "The Promise of Happiness", "year": 2010 }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Ecofeminism",
+      "children": [
+        {
+          "name": "Vandana Shiva",
+          "children": [
+            { "name": "Staying Alive: Women, Ecology and Development", "year": 1988 },
+            { "name": "Ecofeminism", "year": 1993 }
+          ]
+        },
+        {
+          "name": "Françoise d'Eaubonne",
+          "children": [
+            { "name": "Le Féminisme ou la Mort", "year": 1974 }
+          ]
+        },
+        {
+          "name": "Maria Mies",
+          "children": [
+            { "name": "Patriarchy and Accumulation on a World Scale", "year": 1986 }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Feminism of Difference",
+      "children": [
+        {
+          "name": "Luce Irigaray",
+          "children": [
+            { "name": "Speculum of the Other Woman", "year": 1974 },
+            { "name": "This Sex Which Is Not One", "year": 1977 }
+          ]
+        },
+        {
+          "name": "Hélène Cixous",
+          "children": [
+            { "name": "The Laugh of the Medusa", "year": 1975 }
+          ]
+        },
+        {
+          "name": "Julia Kristeva",
+          "children": [
+            { "name": "Powers of Horror", "year": 1980 },
+            { "name": "Women's Time", "year": 1979 }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Punk Feminism",
+      "children": [
+        {
+          "name": "Valerie Solanas",
+          "children": [
+            { "name": "SCUM Manifesto", "year": 1967 }
+          ]
+        },
+        {
+          "name": "Itziar Ziga",
+          "children": [
+            { "name": "Devenir Perra", "year": 2009 }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Maternal Feminism",
+      "children": [
+        {
+          "name": "Sara Ruddick",
+          "children": [
+            { "name": "Maternal Thinking", "year": 1989 }
+          ]
+        },
+        {
+          "name": "Adrienne Rich",
+          "children": [
+            { "name": "Of Woman Born", "year": 1976 }
+          ]
+        },
+        {
+          "name": "Nel Noddings",
+          "children": [
+            { "name": "Caring: A Feminine Approach to Ethics", "year": 1984 }
+          ]
+        }
+      ]
+    }
+  ]
+}
