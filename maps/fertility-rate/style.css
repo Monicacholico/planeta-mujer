@@ -1,0 +1,158 @@
+.back-link {
+    display: inline-block;
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    margin-bottom: 1rem;
+}
+
+.back-link:hover {
+    color: var(--color-white);
+}
+
+.piece-header {
+    padding-top: calc(var(--nav-height) + 2rem);
+    padding-bottom: 1rem;
+    text-align: center;
+}
+
+.piece-header h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    color: var(--color-white);
+    margin-bottom: 0.75rem;
+}
+
+.piece-subtitle {
+    font-size: 1.05rem;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    max-width: 680px;
+}
+
+.piece-source {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--color-text-subtle);
+}
+
+.piece-source a {
+    color: var(--color-accent-alt);
+    text-decoration: none;
+}
+
+.piece-source a:hover {
+    text-decoration: underline;
+}
+
+#chart {
+    width: 100%;
+    margin-top: 1rem;
+}
+
+#chart svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.line {
+    fill: none;
+    stroke: var(--color-accent);
+    stroke-width: 2.5;
+}
+
+.area {
+    fill: var(--color-accent);
+    opacity: 0.08;
+}
+
+.axis text {
+    fill: var(--color-text-muted);
+    font-size: 12px;
+}
+
+.axis line,
+.axis path {
+    stroke: var(--color-border);
+}
+
+.grid line {
+    stroke: var(--color-border);
+    stroke-opacity: 0.4;
+}
+
+.grid path {
+    stroke: none;
+}
+
+.replacement-line {
+    stroke: var(--color-text-subtle);
+    stroke-width: 1;
+    stroke-dasharray: 6 4;
+}
+
+.replacement-label {
+    fill: var(--color-text-subtle);
+    font-size: 11px;
+}
+
+.annotation-line {
+    stroke: var(--color-accent-alt);
+    stroke-width: 1;
+    stroke-dasharray: 3 2;
+    opacity: 0.6;
+}
+
+.annotation-dot {
+    fill: var(--color-accent-alt);
+    opacity: 0.8;
+}
+
+.annotation-text {
+    fill: var(--color-text-muted);
+    font-size: 10px;
+    line-height: 1.3;
+}
+
+.tooltip {
+    position: absolute;
+    pointer-events: none;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+    color: var(--color-text);
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+.tooltip .year {
+    font-weight: 600;
+    color: var(--color-white);
+}
+
+.tooltip .value {
+    color: var(--color-accent);
+}
+
+.hover-circle {
+    fill: var(--color-accent);
+    stroke: var(--color-bg);
+    stroke-width: 2;
+}
+
+.hover-line {
+    stroke: var(--color-text-subtle);
+    stroke-width: 1;
+    stroke-dasharray: 3 3;
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 768px) {
+    .piece-header {
+        text-align: left;
+    }
+}

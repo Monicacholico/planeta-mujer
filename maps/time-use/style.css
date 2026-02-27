@@ -179,6 +179,9 @@
         flex-direction: column-reverse;
         align-items: center;
     }
+    .piece-header {
+        text-align: left;
+    }
 
     .country-list {
         flex: none;

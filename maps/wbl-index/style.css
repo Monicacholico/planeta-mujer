@@ -152,6 +152,10 @@
 /* ── Responsive ── */
 
 @media (max-width: 768px) {
+    .piece-header {
+        text-align: left;
+    }
+    
     .scrolly {
         flex-direction: column;
     }
