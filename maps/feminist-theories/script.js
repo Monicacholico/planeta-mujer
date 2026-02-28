@@ -51,7 +51,6 @@ d3.json("data/theories.json").then(rawData => {
         .innerRadius(d => d.y0 * radius)
         .outerRadius(d => Math.max(d.y0 * radius, d.y1 * radius - 1));
 
-    console.log("arc", arc);
     // ──── Layer 4: Render ────
     const breadcrumb = d3.select("#chart")
         .append("div")
