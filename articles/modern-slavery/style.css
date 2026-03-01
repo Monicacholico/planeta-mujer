@@ -1,0 +1,167 @@
+/* ============================================
+   CANVAS — fixed behind everything
+   ============================================ */
+
+#canvas-wrap {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 0;
+}
+
+#viz {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* ============================================
+   SCROLLY — text sections on top of canvas
+   ============================================ */
+
+#scrolly {
+    position: relative;
+    z-index: 1;
+}
+
+.step {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    pointer-events: none;
+}
+
+.step-content {
+    max-width: 560px;
+    background: rgba(12, 14, 21, 0.25);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem 3rem;
+    pointer-events: auto;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.step.is-active .step-content {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.step-content p {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--color-text);
+    margin-bottom: 1rem;
+}
+
+.step-content p:last-child {
+    margin-bottom: 0;
+}
+
+.step-content strong {
+    color: var(--color-white);
+    font-weight: 600;
+}
+
+.step-accent {
+    font-family: var(--font-display);
+    font-size: 1.35rem !important;
+    color: var(--color-accent) !important;
+    font-style: italic;
+    line-height: 1.5 !important;
+}
+
+/* ============================================
+   HERO step — centered, no card background
+   ============================================ */
+
+.step-content--hero {
+    background: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: none;
+    text-align: center;
+    max-width: 700px;
+}
+
+.step-kicker {
+    font-size: 0.9rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--color-text-muted) !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.hero-number {
+    font-family: var(--font-display);
+    font-size: clamp(4rem, 12vw, 9rem);
+    font-weight: 400;
+    color: var(--color-white);
+    line-height: 1;
+    margin-bottom: 0.4rem;
+}
+
+.hero-sub {
+    font-size: 1.3rem !important;
+    color: var(--color-text-muted) !important;
+    max-width: 400px;
+    margin: 0 auto 2rem !important;
+}
+
+.hero-hint {
+    font-size: 0.78rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-text-subtle) !important;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+}
+
+/* ============================================
+   FOOTER — above canvas
+   ============================================ */
+
+.site-footer {
+    position: relative;
+    z-index: 1;
+    background: var(--color-bg);
+}
+
+.footer-source {
+    margin-top: 1rem;
+    font-size: 0.75rem;
+    color: var(--color-text-subtle);
+}
+
+.footer-source a {
+    color: var(--color-text-muted);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+    .step-content {
+        padding: 1.8rem 1.5rem;
+    }
+
+    .hero-number {
+        font-size: clamp(3rem, 15vw, 6rem);
+    }
+
+    .step-content p {
+        font-size: 1rem;
+    }
+}
