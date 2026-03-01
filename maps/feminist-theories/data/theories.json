@@ -30,6 +30,13 @@
             { "name": "Sex and Social Justice", "year": 1999 },
             { "name": "Women and Human Development", "year": 2000 }
           ]
+        },
+        {
+          "name": "Celia Amorós",
+          "children": [
+            { "name": "Hacia una crítica de la razón patriarcal", "year": 1985 },
+            { "name": "Tiempo de feminismo", "year": 1997 }
+          ]
         }
       ]
     },
