@@ -79,6 +79,35 @@
 }
 
 /* ============================================
+   SIDE step — card on the left, shape on the right
+   ============================================ */
+
+.step--side {
+    justify-content: flex-start;
+    padding-left: 6%;
+}
+
+.step-stat {
+    font-family: var(--font-display);
+    font-size: 1.6rem !important;
+    color: var(--color-white) !important;
+    margin-top: 0.5rem !important;
+}
+
+.step--bottom {
+    align-items: flex-end;
+    padding-bottom: 5%;
+}
+
+.step-content--compact {
+    max-width: 520px;
+    padding: 1.5rem 2rem;
+}
+
+.clr-women { color: var(--color-accent) !important; }
+.clr-men { color: var(--color-accent-alt) !important; }
+
+/* ============================================
    HERO step — centered, no card background
    ============================================ */
 

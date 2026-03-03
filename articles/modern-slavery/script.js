@@ -1,31 +1,36 @@
 (function () {
     const TOTAL_DOTS = 10000;
+    const WOMEN_COUNT = Math.round(TOTAL_DOTS * 0.71);
+    const MEN_COUNT = TOTAL_DOTS - WOMEN_COUNT;
     const DOT_RADIUS = 1.8;
     const BASE_SPEED = 0.3;
     const FRICTION = 0.96;
     const MIN_SPEED = 0.15;
 
+    const COLOR_WOMEN = [232, 160, 191];
+    const COLOR_MEN = [126, 184, 218];
+
     const PALETTE = [
-        [230, 180, 120],   // warm sand
-        [200, 140, 100],   // terracotta
-        [160, 120, 90],    // umber
-        [210, 170, 160],   // blush
-        [180, 160, 200],   // soft lavender
-        [140, 190, 180],   // sage
-        [190, 210, 160],   // soft chartreuse
-        [220, 200, 140],   // gold
-        [170, 140, 160],   // mauve
-        [140, 170, 200],   // slate blue
-        [200, 160, 130],   // sienna
-        [180, 200, 190],   // celadon
+        [230, 180, 120], [200, 140, 100], [160, 120, 90],
+        [210, 170, 160], [180, 160, 200], [140, 190, 180],
+        [190, 210, 160], [220, 200, 140], [170, 140, 160],
+        [140, 170, 200], [200, 160, 130], [180, 200, 190],
     ];
 
-    const STEP_IMPULSES = {
-        "hero": null,
-        "dots-intro": "scatter",
-        "normalize": "agitate",
-        "scale-intro": "gather",
-        "spacer": "scatter"
+    const WORLD_IDS = {
+        "032": "argentina", "724": "spain",
+        "504": "morocco", "116": "cambodia"
+    };
+
+    const SHAPE_NAMES = {
+        argentina: "Argentina", spain: "Spain",
+        morocco: "Morocco", cambodia: "Cambodia",
+        california: "California", "va-md": "Virginia &\nMaryland"
+    };
+
+    const GENDER_PAIRS = {
+        "morocco-cambodia": { women: "morocco", men: "cambodia" },
+        "california-vamd": { women: "california", men: "va-md" }
     };
 
     const canvas = document.getElementById("viz");
@@ -34,7 +39,16 @@
     let width, height, dpr;
     let dots = [];
     let currentStep = "hero";
-    let animationId;
+    let shapeMode = null;
+    let activeLabels = [];
+    let colorBlend = 0;
+    let colorBlendTarget = 0;
+
+    let shapeFeatures = {};
+    let shapeTargets = {};
+    let shapeLabelPos = {};
+
+    let simulation;
 
     // ── Resize ──────────────────────────────────
     function resize() {
@@ -59,50 +73,165 @@
                 vy: Math.sin(angle) * BASE_SPEED,
                 baseRadius: DOT_RADIUS * (0.6 + Math.random() * 0.8),
                 opacity: 0.3 + Math.random() * 0.45,
-                color
+                color,
+                genderColor: i < WOMEN_COUNT ? COLOR_WOMEN : COLOR_MEN,
+                tx: undefined,
+                ty: undefined
             });
         }
     }
 
-    // ── Apply one-time impulse ───────────────────
-    function applyImpulse(type) {
-        const cx = width / 2;
-        const cy = height / 2;
+    // ── Load TopoJSON (world + US states) ───────
+    async function loadData() {
+        const [world, us] = await Promise.all([
+            d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json"),
+            d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json")
+        ]);
 
-        for (const d of dots) {
-            if (type === "scatter") {
-                const dx = d.x - cx;
-                const dy = d.y - cy;
-                const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-                const strength = 2 + Math.random() * 2;
-                d.vx += (dx / dist) * strength;
-                d.vy += (dy / dist) * strength;
-            } else if (type === "agitate") {
-                d.vx += (Math.random() - 0.5) * 4;
-                d.vy += (Math.random() - 0.5) * 4;
-            } else if (type === "gather") {
-                const dx = cx - d.x;
-                const dy = cy - d.y;
-                const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-                const strength = 1.5 + Math.random() * 1.5;
-                d.vx += (dx / dist) * strength;
-                d.vy += (dy / dist) * strength;
+        const worldFeatures = topojson.feature(world, world.objects.countries).features;
+        console.log("worldFeatures", worldFeatures);
+        for (const f of worldFeatures) {
+            const name = WORLD_IDS[f.id];
+            if (name) shapeFeatures[name] = f;
+        }
+
+        const caGeo = us.objects.states.geometries.find(g => g.id === "06");
+        shapeFeatures.california = topojson.feature(us, caGeo);
+
+        const vaGeo = us.objects.states.geometries.find(g => g.id === "51");
+        const mdGeo = us.objects.states.geometries.find(g => g.id === "24");
+        const merged = topojson.merge(us, [vaGeo, mdGeo]);
+        shapeFeatures["va-md"] = { type: "Feature", geometry: merged, properties: {} };
+
+        computeAllTargets();
+    }
+
+    // ── Generate random points inside a shape ───
+    function generateTargets(feature, count, bounds) {
+        const projection = d3.geoMercator().fitExtent(bounds, feature);
+        const [[lonMin, latMin], [lonMax, latMax]] = d3.geoBounds(feature);
+
+        const points = [];
+        while (points.length < count) {
+            const lon = lonMin + Math.random() * (lonMax - lonMin);
+            const lat = latMin + Math.random() * (latMax - latMin);
+            if (d3.geoContains(feature, [lon, lat])) {
+                const [px, py] = projection([lon, lat]);
+                points.push({ x: px, y: py });
             }
         }
+
+        const [cx, cy] = projection(d3.geoCentroid(feature));
+        return { points, labelPos: { x: cx, y: cy } };
     }
 
-    // ── Smoothly send dots back to random positions ──
-    function resetDots() {
-        for (const d of dots) {
-            const tx = Math.random() * width;
-            const ty = Math.random() * height;
-            d.vx = (tx - d.x) * 0.02;
-            d.vy = (ty - d.y) * 0.02;
+    function computeAllTargets() {
+        const mobile = width <= 768;
+        const singleBounds = mobile
+            ? [[width * 0.05, height * 0.15], [width * 0.95, height * 0.85]]
+            : [[width * 0.42, height * 0.06], [width * 0.94, height * 0.94]];
+        const leftBounds = mobile
+            ? [[width * 0.05, height * 0.05], [width * 0.95, height * 0.45]]
+            : [[width * 0.04, height * 0.06], [width * 0.46, height * 0.92]];
+        const rightBounds = mobile
+            ? [[width * 0.05, height * 0.55], [width * 0.95, height * 0.95]]
+            : [[width * 0.54, height * 0.06], [width * 0.96, height * 0.92]];
+
+        for (const name of ["argentina", "spain"]) {
+            if (!shapeFeatures[name]) continue;
+            const r = generateTargets(shapeFeatures[name], TOTAL_DOTS, singleBounds);
+            shapeTargets[name] = r.points;
+            shapeLabelPos[name] = r.labelPos;
+        }
+
+        for (const name of ["morocco", "california"]) {
+            if (!shapeFeatures[name]) continue;
+            const r = generateTargets(shapeFeatures[name], WOMEN_COUNT, leftBounds);
+            shapeTargets[name] = r.points;
+            shapeLabelPos[name] = r.labelPos;
+        }
+
+        for (const name of ["cambodia", "va-md"]) {
+            if (!shapeFeatures[name]) continue;
+            const r = generateTargets(shapeFeatures[name], MEN_COUNT, rightBounds);
+            shapeTargets[name] = r.points;
+            shapeLabelPos[name] = r.labelPos;
         }
     }
 
-    // ── Update dot positions ────────────────────
-    function updateDots() {
+    // ── Single-country shape targeting ──────────
+    function setSingleShape(country) {
+        shapeMode = country;
+        activeLabels = [country];
+        const targets = shapeTargets[country];
+        if (!targets) return;
+
+        for (let i = 0; i < dots.length; i++) {
+            dots[i].tx = targets[i].x;
+            dots[i].ty = targets[i].y;
+        }
+        startSimulation();
+    }
+
+    // ── Gender pair shape targeting ─────────────
+    function setGenderPair(pairKey) {
+        const pair = GENDER_PAIRS[pairKey];
+        if (!pair) return;
+        shapeMode = pairKey;
+        activeLabels = [pair.women, pair.men];
+
+        const wt = shapeTargets[pair.women];
+        const mt = shapeTargets[pair.men];
+        if (!wt || !mt) return;
+
+        for (let i = 0; i < dots.length; i++) {
+            if (i < WOMEN_COUNT) {
+                dots[i].tx = wt[i].x;
+                dots[i].ty = wt[i].y;
+            } else {
+                dots[i].tx = mt[i - WOMEN_COUNT].x;
+                dots[i].ty = mt[i - WOMEN_COUNT].y;
+            }
+        }
+        startSimulation();
+    }
+
+    function startSimulation() {
+        simulation
+            .nodes(dots)
+            .force("x", d3.forceX(d => d.tx).strength(0.06))
+            .force("y", d3.forceY(d => d.ty).strength(0.06))
+            .alpha(1)
+            .restart()
+            .stop();
+    }
+
+    function clearTargets() {
+        shapeMode = null;
+        activeLabels = [];
+        simulation.force("x", null).force("y", null).alpha(0);
+
+        for (const d of dots) {
+            const rx = Math.random() * width;
+            const ry = Math.random() * height;
+            d.vx = (rx - d.x) * 0.06;
+            d.vy = (ry - d.y) * 0.06;
+            d.tx = undefined;
+            d.ty = undefined;
+        }
+    }
+
+    function resetDots() {
+        for (const d of dots) {
+            const rx = Math.random() * width;
+            const ry = Math.random() * height;
+            d.vx = (rx - d.x) * 0.08;
+            d.vy = (ry - d.y) * 0.08;
+        }
+    }
+
+    // ── Manual drift (free-floating mode) ───────
+    function driftDots() {
         for (const d of dots) {
             d.vx *= FRICTION;
             d.vy *= FRICTION;
@@ -129,21 +258,76 @@
         ctx.clearRect(0, 0, width, height);
 
         const boost = currentStep !== "hero" ? 0.15 : 0;
+        const p = colorBlend;
 
         for (const d of dots) {
             const [r, g, b] = d.color;
+            const [gr, gg, gb] = d.genderColor;
+            const fr = r + (gr - r) * p;
+            const fg = g + (gg - g) * p;
+            const fb = b + (gb - b) * p;
+
             ctx.beginPath();
             ctx.arc(d.x, d.y, d.baseRadius, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(${r},${g},${b},${d.opacity + boost})`;
+            ctx.fillStyle = `rgba(${fr},${fg},${fb},${d.opacity + boost})`;
             ctx.fill();
+        }
+
+        if (activeLabels.length > 0) {
+            const fontSize = width > 768 ? Math.min(56, width * 0.035) : Math.min(40, width * 0.08);
+            ctx.font = `600 ${fontSize}px 'Playfair Display', Georgia, serif`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.shadowColor = "rgba(0, 0, 0, 0.7)";
+            ctx.shadowBlur = 12;
+            ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
+
+            for (const key of activeLabels) {
+                const pos = shapeLabelPos[key];
+                if (!pos) continue;
+                const name = SHAPE_NAMES[key] || key;
+                const lines = name.split("\n");
+                for (let li = 0; li < lines.length; li++) {
+                    ctx.fillText(lines[li], pos.x, pos.y + li * (fontSize * 1.2));
+                }
+            }
+
+            ctx.shadowColor = "transparent";
+            ctx.shadowBlur = 0;
         }
     }
 
     // ── Animation loop ──────────────────────────
     function tick() {
-        updateDots();
+        colorBlend += (colorBlendTarget - colorBlend) * 0.025;
+
+        if (shapeMode) {
+            simulation.tick();
+        } else {
+            driftDots();
+        }
         draw();
-        animationId = requestAnimationFrame(tick);
+        requestAnimationFrame(tick);
+    }
+
+    // ── Handle step transitions ─────────────────
+    function handleStep(step, direction) {
+        currentStep = step;
+
+        if (step === "argentina" || step === "spain") {
+            colorBlendTarget = 0;
+            setSingleShape(step);
+        } else if (GENDER_PAIRS[step]) {
+            colorBlendTarget = 1;
+            setGenderPair(step);
+        } else if (step === "gender-intro") {
+            colorBlendTarget = 1;
+            if (shapeMode) clearTargets();
+        } else {
+            colorBlendTarget = 0;
+            if (shapeMode) clearTargets();
+            if (step === "hero" && direction === "up") resetDots();
+        }
     }
 
     // ── Scrollama setup ─────────────────────────
@@ -157,15 +341,8 @@
                 debug: false
             })
             .onStepEnter(({ element, direction }) => {
-                currentStep = element.dataset.step;
+                handleStep(element.dataset.step, direction);
                 element.classList.add("is-active");
-
-                if (element.dataset.step === "hero" && direction === "up") {
-                    resetDots();
-                } else {
-                    const impulse = STEP_IMPULSES[element.dataset.step];
-                    if (impulse) applyImpulse(impulse);
-                }
             })
             .onStepExit(({ element, direction }) => {
                 if (direction === "up") {
@@ -177,15 +354,29 @@
     }
 
     // ── Init ────────────────────────────────────
-    function init() {
+    async function init() {
         resize();
         createDots();
+
+        simulation = d3.forceSimulation()
+            .velocityDecay(0.35)
+            .alphaDecay(0.015)
+            .stop();
+
         setupScrollama();
-        tick();
+        requestAnimationFrame(tick);
+
+        await loadData();
 
         window.addEventListener("resize", () => {
             resize();
             createDots();
+            computeAllTargets();
+            if (shapeMode && !GENDER_PAIRS[shapeMode]) {
+                setSingleShape(shapeMode);
+            } else if (GENDER_PAIRS[shapeMode]) {
+                setGenderPair(shapeMode);
+            }
         });
 
         document.querySelector('.step[data-step="hero"]').classList.add("is-active");
