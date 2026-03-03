@@ -9,6 +9,7 @@
 
     const COLOR_WOMEN = [232, 160, 191];
     const COLOR_MEN = [126, 184, 218];
+    const COLOR_HIGHLIGHT = [255, 220, 120];
 
     const PALETTE = [
         [230, 180, 120], [200, 140, 100], [160, 120, 90],
@@ -33,6 +34,12 @@
         "california-vamd": { women: "california", men: "va-md" }
     };
 
+    const HISTORY_HIGHLIGHTS = {
+        "history-slavery": Math.round(12500000 / 5000),
+        "history-holocaust": Math.round(17000000 / 5000),
+        "history-ww2": TOTAL_DOTS
+    };
+
     const canvas = document.getElementById("viz");
     const ctx = canvas.getContext("2d");
 
@@ -43,10 +50,13 @@
     let activeLabels = [];
     let colorBlend = 0;
     let colorBlendTarget = 0;
+    let highlightCount = 0;
+    let highlightTarget = 0;
 
     let shapeFeatures = {};
     let shapeTargets = {};
     let shapeLabelPos = {};
+    let circleTargets = [];
 
     let simulation;
 
@@ -81,6 +91,23 @@
         }
     }
 
+    // ── Generate circle targets (planet shape) ──
+    function computeCircleTargets() {
+        const cx = width > 768 ? width * 0.65 : width * 0.5;
+        const cy = height * 0.5;
+        const radius = Math.min(width, height) * (width > 768 ? 0.35 : 0.3);
+
+        circleTargets = [];
+        for (let i = 0; i < TOTAL_DOTS; i++) {
+            const a = Math.random() * Math.PI * 2;
+            const r = radius * Math.sqrt(Math.random());
+            circleTargets.push({
+                x: cx + Math.cos(a) * r,
+                y: cy + Math.sin(a) * r
+            });
+        }
+    }
+
     // ── Load TopoJSON (world + US states) ───────
     async function loadData() {
         const [world, us] = await Promise.all([
@@ -89,7 +116,6 @@
         ]);
 
         const worldFeatures = topojson.feature(world, world.objects.countries).features;
-        console.log("worldFeatures", worldFeatures);
         for (const f of worldFeatures) {
             const name = WORLD_IDS[f.id];
             if (name) shapeFeatures[name] = f;
@@ -157,6 +183,8 @@
             shapeTargets[name] = r.points;
             shapeLabelPos[name] = r.labelPos;
         }
+
+        computeCircleTargets();
     }
 
     // ── Single-country shape targeting ──────────
@@ -192,6 +220,18 @@
                 dots[i].tx = mt[i - WOMEN_COUNT].x;
                 dots[i].ty = mt[i - WOMEN_COUNT].y;
             }
+        }
+        startSimulation();
+    }
+
+    // ── Circle shape targeting ──────────────────
+    function setCircleShape() {
+        shapeMode = "circle";
+        activeLabels = [];
+
+        for (let i = 0; i < dots.length; i++) {
+            dots[i].tx = circleTargets[i].x;
+            dots[i].ty = circleTargets[i].y;
         }
         startSimulation();
     }
@@ -259,17 +299,34 @@
 
         const boost = currentStep !== "hero" ? 0.15 : 0;
         const p = colorBlend;
+        const hlCount = Math.round(highlightCount);
+        const inHistoryMode = hlCount > 0;
 
-        for (const d of dots) {
+        for (let i = 0; i < dots.length; i++) {
+            const d = dots[i];
             const [r, g, b] = d.color;
             const [gr, gg, gb] = d.genderColor;
-            const fr = r + (gr - r) * p;
-            const fg = g + (gg - g) * p;
-            const fb = b + (gb - b) * p;
+
+            let fr = r + (gr - r) * p;
+            let fg = g + (gg - g) * p;
+            let fb = b + (gb - b) * p;
+            let alpha = d.opacity + boost;
+
+            if (inHistoryMode) {
+                if (i < hlCount) {
+                    const [hr, hg, hb] = COLOR_HIGHLIGHT;
+                    fr = fr + (hr - fr) * 0.7;
+                    fg = fg + (hg - fg) * 0.7;
+                    fb = fb + (hb - fb) * 0.7;
+                    alpha = Math.max(alpha, 0.7);
+                } else {
+                    alpha *= 0.15;
+                }
+            }
 
             ctx.beginPath();
             ctx.arc(d.x, d.y, d.baseRadius, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(${fr},${fg},${fb},${d.opacity + boost})`;
+            ctx.fillStyle = `rgba(${fr},${fg},${fb},${alpha})`;
             ctx.fill();
         }
 
@@ -300,6 +357,7 @@
     // ── Animation loop ──────────────────────────
     function tick() {
         colorBlend += (colorBlendTarget - colorBlend) * 0.025;
+        highlightCount += (highlightTarget - highlightCount) * 0.04;
 
         if (shapeMode) {
             simulation.tick();
@@ -316,15 +374,27 @@
 
         if (step === "argentina" || step === "spain") {
             colorBlendTarget = 0;
+            highlightTarget = 0;
             setSingleShape(step);
         } else if (GENDER_PAIRS[step]) {
             colorBlendTarget = 1;
+            highlightTarget = 0;
             setGenderPair(step);
         } else if (step === "gender-intro") {
             colorBlendTarget = 1;
+            highlightTarget = 0;
             if (shapeMode) clearTargets();
+        } else if (step === "history-intro") {
+            colorBlendTarget = 0;
+            highlightTarget = 0;
+            setCircleShape();
+        } else if (HISTORY_HIGHLIGHTS[step] !== undefined) {
+            colorBlendTarget = 0;
+            highlightTarget = HISTORY_HIGHLIGHTS[step];
+            if (shapeMode !== "circle") setCircleShape();
         } else {
             colorBlendTarget = 0;
+            highlightTarget = 0;
             if (shapeMode) clearTargets();
             if (step === "hero" && direction === "up") resetDots();
         }
@@ -357,6 +427,7 @@
     async function init() {
         resize();
         createDots();
+        computeCircleTargets();
 
         simulation = d3.forceSimulation()
             .velocityDecay(0.35)
@@ -372,7 +443,9 @@
             resize();
             createDots();
             computeAllTargets();
-            if (shapeMode && !GENDER_PAIRS[shapeMode]) {
+            if (shapeMode === "circle") {
+                setCircleShape();
+            } else if (shapeMode && !GENDER_PAIRS[shapeMode]) {
                 setSingleShape(shapeMode);
             } else if (GENDER_PAIRS[shapeMode]) {
                 setGenderPair(shapeMode);
