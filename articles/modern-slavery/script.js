@@ -77,9 +77,7 @@
     function resize() {
         dpr = window.devicePixelRatio || 1;
         width = window.innerWidth;
-        height = window.visualViewport
-            ? window.visualViewport.height
-            : window.innerHeight;
+        height = window.innerHeight;
         canvas.width = width * dpr;
         canvas.height = height * dpr;
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -384,7 +382,7 @@
         }
 
         if (circleLabel && circleLabelOpacity > 0.005) {
-            const fontSize = width > 768 ? Math.min(56, width * 0.035) : Math.min(40, width * 0.08);
+            const fontSize = width > 768 ? Math.min(56, width * 0.035) : Math.min(52, width * 0.12);
             ctx.font = `600 ${fontSize}px 'Playfair Display', Georgia, serif`;
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
@@ -479,13 +477,6 @@
             });
 
         window.addEventListener("resize", scroller.resize);
-
-        if (window.visualViewport) {
-            window.visualViewport.addEventListener("resize", () => {
-                resize();
-                scroller.resize();
-            });
-        }
     }
 
     // ── Init ────────────────────────────────────
