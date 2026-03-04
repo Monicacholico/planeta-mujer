@@ -40,6 +40,12 @@
         "history-ww2": TOTAL_DOTS
     };
 
+    const HISTORY_LABELS = {
+        "history-slavery": "Slavery",
+        "history-holocaust": "Holocaust",
+        "history-ww2": "World War II"
+    };
+
     const canvas = document.getElementById("viz");
     const ctx = canvas.getContext("2d");
 
@@ -53,10 +59,17 @@
     let highlightCount = 0;
     let highlightTarget = 0;
 
+    let circleLabel = "";
+    let circleLabelNext = "";
+    let circleLabelOpacity = 0;
+    let circleLabelFading = false;
+
     let shapeFeatures = {};
     let shapeTargets = {};
     let shapeLabelPos = {};
     let circleTargets = [];
+    let circleCenterX = 0;
+    let circleCenterY = 0;
 
     let simulation;
 
@@ -64,7 +77,9 @@
     function resize() {
         dpr = window.devicePixelRatio || 1;
         width = window.innerWidth;
-        height = window.innerHeight;
+        height = window.visualViewport
+            ? window.visualViewport.height
+            : window.innerHeight;
         canvas.width = width * dpr;
         canvas.height = height * dpr;
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -93,8 +108,8 @@
 
     // ── Generate circle targets (planet shape) ──
     function computeCircleTargets() {
-        const cx = width > 768 ? width * 0.65 : width * 0.5;
-        const cy = height * 0.5;
+        circleCenterX = width > 768 ? width * 0.65 : width * 0.5;
+        circleCenterY = height * 0.5;
         const radius = Math.min(width, height) * (width > 768 ? 0.35 : 0.3);
 
         circleTargets = [];
@@ -102,8 +117,8 @@
             const a = Math.random() * Math.PI * 2;
             const r = radius * Math.sqrt(Math.random());
             circleTargets.push({
-                x: cx + Math.cos(a) * r,
-                y: cy + Math.sin(a) * r
+                x: circleCenterX + Math.cos(a) * r,
+                y: circleCenterY + Math.sin(a) * r
             });
         }
     }
@@ -246,9 +261,24 @@
             .stop();
     }
 
+    function setCircleLabel(text) {
+        if (text === circleLabel && !circleLabelFading) return;
+        circleLabelNext = text;
+        if (!circleLabel) {
+            circleLabel = text;
+            circleLabelFading = false;
+        } else {
+            circleLabelFading = true;
+        }
+    }
+
     function clearTargets() {
         shapeMode = null;
         activeLabels = [];
+        circleLabel = "";
+        circleLabelNext = "";
+        circleLabelOpacity = 0;
+        circleLabelFading = false;
         simulation.force("x", null).force("y", null).alpha(0);
 
         for (const d of dots) {
@@ -352,12 +382,35 @@
             ctx.shadowColor = "transparent";
             ctx.shadowBlur = 0;
         }
+
+        if (circleLabel && circleLabelOpacity > 0.005) {
+            const fontSize = width > 768 ? Math.min(56, width * 0.035) : Math.min(40, width * 0.08);
+            ctx.font = `600 ${fontSize}px 'Playfair Display', Georgia, serif`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.shadowColor = `rgba(0, 0, 0, ${0.7 * circleLabelOpacity})`;
+            ctx.shadowBlur = 12;
+            ctx.fillStyle = `rgba(255, 255, 255, ${0.75 * circleLabelOpacity})`;
+            ctx.fillText(circleLabel, circleCenterX, circleCenterY);
+            ctx.shadowColor = "transparent";
+            ctx.shadowBlur = 0;
+        }
     }
 
     // ── Animation loop ──────────────────────────
     function tick() {
         colorBlend += (colorBlendTarget - colorBlend) * 0.025;
         highlightCount += (highlightTarget - highlightCount) * 0.04;
+
+        if (circleLabelFading) {
+            circleLabelOpacity += (0 - circleLabelOpacity) * 0.08;
+            if (circleLabelOpacity < 0.02) {
+                circleLabel = circleLabelNext;
+                circleLabelFading = false;
+            }
+        } else if (circleLabel) {
+            circleLabelOpacity += (1 - circleLabelOpacity) * 0.06;
+        }
 
         if (shapeMode) {
             simulation.tick();
@@ -387,10 +440,15 @@
         } else if (step === "history-intro") {
             colorBlendTarget = 0;
             highlightTarget = 0;
+            circleLabel = "";
+            circleLabelNext = "";
+            circleLabelOpacity = 0;
+            circleLabelFading = false;
             setCircleShape();
         } else if (HISTORY_HIGHLIGHTS[step] !== undefined) {
             colorBlendTarget = 0;
             highlightTarget = HISTORY_HIGHLIGHTS[step];
+            setCircleLabel(HISTORY_LABELS[step]);
             if (shapeMode !== "circle") setCircleShape();
         } else {
             colorBlendTarget = 0;
@@ -421,6 +479,13 @@
             });
 
         window.addEventListener("resize", scroller.resize);
+
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener("resize", () => {
+                resize();
+                scroller.resize();
+            });
+        }
     }
 
     // ── Init ────────────────────────────────────
