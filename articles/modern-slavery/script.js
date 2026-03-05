@@ -71,6 +71,11 @@
     let circleCenterX = 0;
     let circleCenterY = 0;
 
+    let worldFeaturesList = [];
+    let slaveryDots = {};
+    let worldMapTargets = [];
+    let worldMapReady = false;
+
     let simulation;
 
     // ── Resize ──────────────────────────────────
@@ -121,15 +126,18 @@
         }
     }
 
-    // ── Load TopoJSON (world + US states) ───────
+    // ── Load TopoJSON + slavery data ────────────
     async function loadData() {
-        const [world, us] = await Promise.all([
+        const [world, us, slaveryData] = await Promise.all([
             d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json"),
-            d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json")
+            d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json"),
+            d3.json("data/slavery-prevalence.json")
         ]);
 
-        const worldFeatures = topojson.feature(world, world.objects.countries).features;
-        for (const f of worldFeatures) {
+        worldFeaturesList = topojson.feature(world, world.objects.countries).features;
+        slaveryDots = slaveryData.dots;
+
+        for (const f of worldFeaturesList) {
             const name = WORLD_IDS[f.id];
             if (name) shapeFeatures[name] = f;
         }
@@ -162,6 +170,84 @@
 
         const [cx, cy] = projection(d3.geoCentroid(feature));
         return { points, labelPos: { x: cx, y: cy } };
+    }
+
+    // ── Generate points inside shape with shared projection ──
+    function generateWorldPoints(feature, count, projection) {
+        const [[lonMin, latMin], [lonMax, latMax]] = d3.geoBounds(feature);
+        const points = [];
+        let attempts = 0;
+        const maxAttempts = count * 500;
+
+        while (points.length < count && attempts < maxAttempts) {
+            attempts++;
+            const lon = lonMin + Math.random() * (lonMax - lonMin);
+            const lat = latMin + Math.random() * (latMax - latMin);
+            if (d3.geoContains(feature, [lon, lat])) {
+                const [px, py] = projection([lon, lat]);
+                if (px >= 0 && px <= width && py >= 0 && py <= height) {
+                    points.push({ x: px, y: py });
+                }
+            }
+        }
+
+        if (points.length < count) {
+            const [cx, cy] = projection(d3.geoCentroid(feature));
+            while (points.length < count) {
+                points.push({
+                    x: cx + (Math.random() - 0.5) * 10,
+                    y: cy + (Math.random() - 0.5) * 10
+                });
+            }
+        }
+
+        return points;
+    }
+
+    // ── Compute world map targets ───────────────
+    function computeWorldMapTargets() {
+        if (!worldFeaturesList.length || !Object.keys(slaveryDots).length) return;
+
+        const padding = width > 768 ? 0.02 : 0.01;
+        const mapBounds = [
+            [width * padding, height * 0.08],
+            [width * (1 - padding), height * 0.92]
+        ];
+
+        const allFeatures = {
+            type: "FeatureCollection",
+            features: worldFeaturesList
+        };
+        const projection = d3.geoNaturalEarth1().fitExtent(mapBounds, allFeatures);
+
+        const allocations = [];
+        let allocated = 0;
+
+        for (const feature of worldFeaturesList) {
+            const dotCount = slaveryDots[feature.id] || 0;
+            if (dotCount > 0) {
+                allocations.push({ feature, dots: dotCount });
+                allocated += dotCount;
+            }
+        }
+
+        const remainder = TOTAL_DOTS - allocated;
+        if (remainder > 0 && allocations.length > 0) {
+            allocations[0].dots += remainder;
+        }
+
+        worldMapTargets = [];
+        for (const { feature, dots: count } of allocations) {
+            const pts = generateWorldPoints(feature, count, projection);
+            worldMapTargets.push(...pts);
+        }
+
+        for (let i = worldMapTargets.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [worldMapTargets[i], worldMapTargets[j]] = [worldMapTargets[j], worldMapTargets[i]];
+        }
+
+        worldMapReady = true;
     }
 
     function computeAllTargets() {
@@ -198,6 +284,7 @@
         }
 
         computeCircleTargets();
+        computeWorldMapTargets();
     }
 
     // ── Single-country shape targeting ──────────
@@ -245,6 +332,23 @@
         for (let i = 0; i < dots.length; i++) {
             dots[i].tx = circleTargets[i].x;
             dots[i].ty = circleTargets[i].y;
+        }
+        startSimulation();
+    }
+
+    // ── World map targeting ─────────────────────
+    function setWorldMap() {
+        if (!worldMapReady) return;
+        shapeMode = "worldmap";
+        activeLabels = [];
+        circleLabel = "";
+        circleLabelNext = "";
+        circleLabelOpacity = 0;
+        circleLabelFading = false;
+
+        for (let i = 0; i < dots.length; i++) {
+            dots[i].tx = worldMapTargets[i].x;
+            dots[i].ty = worldMapTargets[i].y;
         }
         startSimulation();
     }
@@ -448,6 +552,10 @@
             highlightTarget = HISTORY_HIGHLIGHTS[step];
             setCircleLabel(HISTORY_LABELS[step]);
             if (shapeMode !== "circle") setCircleShape();
+        } else if (step === "world-map") {
+            colorBlendTarget = 0;
+            highlightTarget = 0;
+            setWorldMap();
         } else {
             colorBlendTarget = 0;
             highlightTarget = 0;
@@ -501,6 +609,8 @@
             computeAllTargets();
             if (shapeMode === "circle") {
                 setCircleShape();
+            } else if (shapeMode === "worldmap") {
+                setWorldMap();
             } else if (shapeMode && !GENDER_PAIRS[shapeMode]) {
                 setSingleShape(shapeMode);
             } else if (GENDER_PAIRS[shapeMode]) {
