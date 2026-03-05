@@ -151,6 +151,7 @@
         shapeFeatures["va-md"] = { type: "Feature", geometry: merged, properties: {} };
 
         computeAllTargets();
+        setTimeout(computeWorldMapTargets, 200);
     }
 
     // ── Generate random points inside a shape ───
@@ -177,7 +178,7 @@
         const [[lonMin, latMin], [lonMax, latMax]] = d3.geoBounds(feature);
         const points = [];
         let attempts = 0;
-        const maxAttempts = count * 500;
+        const maxAttempts = count * 200;
 
         while (points.length < count && attempts < maxAttempts) {
             attempts++;
@@ -204,9 +205,15 @@
         return points;
     }
 
-    // ── Compute world map targets ───────────────
+    // ── Compute world map targets (chunked, non-blocking) ──
+    let worldMapBuildId = 0;
+
     function computeWorldMapTargets() {
         if (!worldFeaturesList.length || !Object.keys(slaveryDots).length) return;
+
+        worldMapReady = false;
+        worldMapBuildId++;
+        const buildId = worldMapBuildId;
 
         const padding = width > 768 ? 0.02 : 0.01;
         const mapBounds = [
@@ -236,18 +243,35 @@
             allocations[0].dots += remainder;
         }
 
-        worldMapTargets = [];
-        for (const { feature, dots: count } of allocations) {
-            const pts = generateWorldPoints(feature, count, projection);
-            worldMapTargets.push(...pts);
+        const collectedPoints = [];
+        let idx = 0;
+        const CHUNK_SIZE = 5;
+
+        function processChunk() {
+            if (buildId !== worldMapBuildId) return;
+
+            const end = Math.min(idx + CHUNK_SIZE, allocations.length);
+            for (; idx < end; idx++) {
+                const { feature, dots: count } = allocations[idx];
+                const pts = generateWorldPoints(feature, count, projection);
+                collectedPoints.push(...pts);
+            }
+
+            if (idx < allocations.length) {
+                setTimeout(processChunk, 0);
+            } else {
+                for (let i = collectedPoints.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [collectedPoints[i], collectedPoints[j]] = [collectedPoints[j], collectedPoints[i]];
+                }
+                worldMapTargets = collectedPoints;
+                worldMapReady = true;
+
+                if (shapeMode === "worldmap") setWorldMap();
+            }
         }
 
-        for (let i = worldMapTargets.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [worldMapTargets[i], worldMapTargets[j]] = [worldMapTargets[j], worldMapTargets[i]];
-        }
-
-        worldMapReady = true;
+        setTimeout(processChunk, 0);
     }
 
     function computeAllTargets() {
@@ -284,7 +308,6 @@
         }
 
         computeCircleTargets();
-        computeWorldMapTargets();
     }
 
     // ── Single-country shape targeting ──────────
@@ -607,6 +630,7 @@
             resize();
             createDots();
             computeAllTargets();
+            setTimeout(computeWorldMapTargets, 100);
             if (shapeMode === "circle") {
                 setCircleShape();
             } else if (shapeMode === "worldmap") {
