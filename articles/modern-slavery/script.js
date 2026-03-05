@@ -579,7 +579,7 @@
             colorBlendTarget = 0;
             highlightTarget = 0;
             setWorldMap();
-            startSimulation();
+            // startSimulation();
         } else {
             colorBlendTarget = 0;
             highlightTarget = 0;
