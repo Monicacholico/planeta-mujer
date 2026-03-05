@@ -151,7 +151,6 @@
         shapeFeatures["va-md"] = { type: "Feature", geometry: merged, properties: {} };
 
         computeAllTargets();
-        setTimeout(computeWorldMapTargets, 200);
     }
 
     // ── Generate random points inside a shape ───
@@ -178,7 +177,7 @@
         const [[lonMin, latMin], [lonMax, latMax]] = d3.geoBounds(feature);
         const points = [];
         let attempts = 0;
-        const maxAttempts = count * 200;
+        const maxAttempts = count * 100;
 
         while (points.length < count && attempts < maxAttempts) {
             attempts++;
@@ -205,12 +204,18 @@
         return points;
     }
 
-    // ── Compute world map targets (chunked, non-blocking) ──
+    // ── Compute world map targets (lazy, one country per frame) ──
     let worldMapBuildId = 0;
+    let worldMapBuildStarted = false;
+
+    function startWorldMapBuild() {
+        if (worldMapBuildStarted || worldMapReady) return;
+        if (!worldFeaturesList.length || !Object.keys(slaveryDots).length) return;
+        worldMapBuildStarted = true;
+        computeWorldMapTargets();
+    }
 
     function computeWorldMapTargets() {
-        if (!worldFeaturesList.length || !Object.keys(slaveryDots).length) return;
-
         worldMapReady = false;
         worldMapBuildId++;
         const buildId = worldMapBuildId;
@@ -245,33 +250,28 @@
 
         const collectedPoints = [];
         let idx = 0;
-        const CHUNK_SIZE = 5;
 
-        function processChunk() {
+        function processOne() {
             if (buildId !== worldMapBuildId) return;
-
-            const end = Math.min(idx + CHUNK_SIZE, allocations.length);
-            for (; idx < end; idx++) {
-                const { feature, dots: count } = allocations[idx];
-                const pts = generateWorldPoints(feature, count, projection);
-                collectedPoints.push(...pts);
-            }
-
-            if (idx < allocations.length) {
-                setTimeout(processChunk, 0);
-            } else {
+            if (idx >= allocations.length) {
                 for (let i = collectedPoints.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [collectedPoints[i], collectedPoints[j]] = [collectedPoints[j], collectedPoints[i]];
                 }
                 worldMapTargets = collectedPoints;
                 worldMapReady = true;
-
                 if (shapeMode === "worldmap") setWorldMap();
+                return;
             }
+
+            const { feature, dots: count } = allocations[idx];
+            const pts = generateWorldPoints(feature, count, projection);
+            collectedPoints.push(...pts);
+            idx++;
+            setTimeout(processOne, 0);
         }
 
-        setTimeout(processChunk, 0);
+        setTimeout(processOne, 0);
     }
 
     function computeAllTargets() {
@@ -361,7 +361,6 @@
 
     // ── World map targeting ─────────────────────
     function setWorldMap() {
-        if (!worldMapReady) return;
         shapeMode = "worldmap";
         activeLabels = [];
         circleLabel = "";
@@ -369,11 +368,16 @@
         circleLabelOpacity = 0;
         circleLabelFading = false;
 
+        if (!worldMapReady) {
+            startWorldMapBuild();
+            return;
+        }
+
         for (let i = 0; i < dots.length; i++) {
             dots[i].tx = worldMapTargets[i].x;
             dots[i].ty = worldMapTargets[i].y;
         }
-        // startSimulation();
+        startSimulation();
     }
 
     function startSimulation() {
@@ -570,6 +574,7 @@
             circleLabelOpacity = 0;
             circleLabelFading = false;
             setCircleShape();
+            startWorldMapBuild();
         } else if (HISTORY_HIGHLIGHTS[step] !== undefined) {
             colorBlendTarget = 0;
             highlightTarget = HISTORY_HIGHLIGHTS[step];
@@ -630,11 +635,15 @@
             resize();
             createDots();
             computeAllTargets();
-            setTimeout(computeWorldMapTargets, 100);
+            if (worldMapReady || worldMapBuildStarted) {
+                worldMapReady = false;
+                worldMapBuildStarted = false;
+                worldMapBuildId++;
+            }
             if (shapeMode === "circle") {
                 setCircleShape();
             } else if (shapeMode === "worldmap") {
-                setWorldMap();
+                startWorldMapBuild();
             } else if (shapeMode && !GENDER_PAIRS[shapeMode]) {
                 setSingleShape(shapeMode);
             } else if (GENDER_PAIRS[shapeMode]) {
