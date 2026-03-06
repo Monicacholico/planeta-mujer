@@ -108,7 +108,7 @@
     // ── Generate circle targets (planet shape) ──
     function computeCircleTargets() {
         circleCenterX = width > 768 ? width * 0.65 : width * 0.5;
-        circleCenterY = height * 0.5;
+        circleCenterY = width > 768 ? height * 0.5 : height * 0.33;
         const radius = Math.min(width, height) * (width > 768 ? 0.35 : 0.3);
 
         circleTargets = [];
@@ -181,9 +181,10 @@
     function computeWorldMapTargets() {
         if (!worldMapPoints || !worldFeaturesList.length) return;
         const padding = width > 768 ? 0.02 : 0.01;
+        const mobile = width <= 768;
         const mapBounds = [
-            [width * padding, height * 0.08],
-            [width * (1 - padding), height * 0.92]
+            [width * padding, height * (mobile ? 0.03 : 0.08)],
+            [width * (1 - padding), height * (mobile ? 0.65 : 0.92)]
         ];
 
         const allFeatures = {
@@ -396,10 +397,10 @@
             if (inHistoryMode) {
                 if (i < hlCount) {
                     const [hr, hg, hb] = COLOR_HIGHLIGHT;
-                    fr = fr + (hr - fr) * 0.2;
-                    fg = fg + (hg - fg) * 0.2;
-                    fb = fb + (hb - fb) * 0.2;
-                    alpha = Math.max(alpha, 0.2);
+                    fr = fr + (hr - fr) * 0.7;
+                    fg = fg + (hg - fg) * 0.7;
+                    fb = fb + (hb - fb) * 0.7;
+                    alpha = Math.max(alpha, 0.7);
                 } else {
                     alpha *= 0.15;
                 }
