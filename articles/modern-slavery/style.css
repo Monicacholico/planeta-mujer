@@ -105,6 +105,10 @@
     padding: 1.5rem 2rem;
 }
 
+.step-content--wide {
+    max-width: 700px;
+}
+
 .clr-women { color: var(--color-accent) !important; }
 .clr-men { color: var(--color-accent-alt) !important; }
 
