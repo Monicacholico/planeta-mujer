@@ -163,6 +163,101 @@
 }
 
 /* ============================================
+   CTA — call to action section
+   ============================================ */
+
+.cta-section {
+    position: relative;
+    z-index: 1;
+    background: var(--color-bg);
+    padding: 5rem 2rem 4rem;
+}
+
+.cta-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.cta-heading {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    color: var(--color-white);
+    margin-bottom: 1.2rem;
+    font-weight: 700;
+}
+
+.cta-text {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--color-text);
+    max-width: 640px;
+    margin: 0 auto 3rem;
+}
+
+.cta-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+.cta-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 2rem 1.5rem;
+    text-align: left;
+    text-decoration: none;
+    transition: background 0.25s, border-color 0.25s, transform 0.25s;
+    display: flex;
+    flex-direction: column;
+}
+
+.cta-card:hover {
+    background: var(--color-bg-card-hover);
+    border-color: var(--color-accent);
+    transform: translateY(-4px);
+}
+
+.cta-card h3 {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    color: var(--color-white);
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+}
+
+.cta-card p {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--color-text);
+    flex: 1;
+}
+
+.cta-link {
+    display: inline-block;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-accent);
+    letter-spacing: 0.02em;
+}
+
+.cta-card:hover .cta-link {
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .cta-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .cta-section {
+        padding: 3.5rem 1.5rem 3rem;
+    }
+}
+
+/* ============================================
    FOOTER — above canvas
    ============================================ */
 
