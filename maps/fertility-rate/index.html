@@ -52,9 +52,65 @@
             <p class="piece-source">Source: <a href="https://data.worldbank.org/indicator/SP.DYN.TFRT.IN" target="_blank" rel="noopener">World Bank</a></p>
         </div>
     </header>
+    <main id="scrolly">
+        <div id="chart-wrap">
+            <div id="chart"></div>
+        </div>
 
-    <main class="container">
-        <div id="chart"></div>
+        <section class="step is-active" data-step="overview">
+            <div class="step-content">
+                <p>In <strong>1960</strong>, the global fertility rate stood at nearly <strong>5 births per woman</strong>. Over the next six decades, it would be cut in half — one of the most dramatic demographic shifts in human history.</p>
+                <p>Scroll to explore what drove this change, decade by decade.</p>
+            </div>
+        </section>
+
+        <section class="step" data-step="1960s">
+            <div class="step-content">
+                <p>The <strong>1960s</strong> mark the beginning of the decline. In 1960, the FDA approves the contraceptive pill in the United States — giving women unprecedented control over reproduction.</p>
+                <p>By 1968, the United Nations declares family planning a basic human right, signaling a global shift in how governments think about population.</p>
+            </div>
+        </section>
+
+        <section class="step" data-step="1970s">
+            <div class="step-content">
+                <p>The <strong>1970s</strong> see the steepest decline. The 1974 World Population Conference in Bucharest sets global fertility targets for the first time.</p>
+                <p>Governments across Asia and Latin America launch family planning programs. The global rate drops from 4.7 to 3.7 in a single decade — the fastest fall in recorded history.</p>
+            </div>
+        </section>
+
+        <section class="step" data-step="1980s">
+            <div class="step-content">
+                <p>In <strong>1979</strong>, China introduces its one-child policy — the most dramatic state intervention in fertility ever attempted, affecting over a billion people.</p>
+                <p>Through the <strong>1980s</strong>, the decline continues steadily. Education for girls expands across developing nations, and fertility rates follow: every additional year of female schooling is associated with 0.3 fewer births.</p>
+            </div>
+        </section>
+
+        <section class="step" data-step="1990s">
+            <div class="step-content">
+                <p>The <strong>1994 UN Cairo Conference</strong> redefines the conversation — shifting from population control to reproductive rights and women's empowerment.</p>
+                <p>Through the <strong>1990s</strong>, the rate crosses below 3 for the first time. Sub-Saharan Africa, the last holdout, begins its own decline.</p>
+            </div>
+        </section>
+
+        <section class="step" data-step="2000s">
+            <div class="step-content">
+                <p>By <strong>2002</strong>, the global rate falls below 2.7 — half of its 1960s peak. The decline slows as many countries approach or pass the replacement level of 2.1.</p>
+                <p>A new concern emerges: countries like Japan, South Korea, and much of Europe now face fertility rates so low they threaten economic stability and aging populations.</p>
+            </div>
+        </section>
+
+        <section class="step" data-step="2010s">
+            <div class="step-content">
+                <p>In <strong>2015</strong>, China ends its one-child policy after 36 years — but births don't bounce back. The cultural shift has already taken hold.</p>
+                <p>By <strong>2023</strong>, the global rate sits at <strong>2.3</strong> — just above replacement. More than half the world's countries are now below 2.1, raising questions not about overpopulation, but about demographic decline.</p>
+            </div>
+        </section>
+
+        <section class="step" data-step="full">
+            <div class="step-content">
+                <p>Sixty years of decline, driven by science, policy, education, and women's choices. The world is having fewer babies — and the consequences, both positive and challenging, are only beginning to unfold.</p>
+            </div>
+        </section>
     </main>
 
     <footer class="site-footer">
@@ -62,6 +118,7 @@
     </footer>
 
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/scrollama@3.2.0/build/scrollama.min.js"></script>
     <script src="../../shared/js/nav.js"></script>
     <script src="script.js"></script>
 </body>
