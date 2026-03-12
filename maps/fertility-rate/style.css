@@ -54,9 +54,9 @@
     top: var(--nav-height, 60px);
     z-index: 0;
     width: 100%;
-    max-width: 960px;
+    max-width: 1125px;
     margin: 0 auto;
-    padding: 1rem 1.5rem 0;
+    padding: 1rem 2rem 0;
     perspective: 1200px;
 }
 
@@ -68,6 +68,22 @@
 }
 
 #chart svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+#illustration-wrap {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: -40px;
+    opacity: 0.25;
+    pointer-events: none;
+}
+
+#illustration-wrap svg {
     display: block;
     width: 100%;
     height: auto;
@@ -241,5 +257,14 @@
 
     #chart-wrap {
         padding: 0.5rem 0.5rem 0;
+    }
+    #illustration-wrap {
+        margin-top: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    #illustration-wrap {
+        display: none;
     }
 }

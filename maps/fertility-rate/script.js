@@ -304,6 +304,47 @@ d3.csv("data/fertility-rate.csv", d3.autoType).then(data => {
         });
     }
 
+    // ──── Illustration stroke animation ────
+    let illuPaths = [];
+    let illuTotalLength = 0;
+
+    fetch("rate-fertility-timeline.svg")
+        .then(r => r.text())
+        .then(svgText => {
+            const wrap = document.getElementById("illustration-wrap");
+            wrap.innerHTML = svgText;
+            const originalPath = wrap.querySelector("path");
+            if (!originalPath) return;
+
+            const svgEl = wrap.querySelector("svg");
+            const stroke = originalPath.getAttribute("stroke") || "#FFC0CB";
+            const strokeWidth = originalPath.getAttribute("stroke-width") || "5";
+            const dAttr = originalPath.getAttribute("d");
+
+            const subpathStrings = dAttr.split(/(?=M)/);
+            originalPath.remove();
+
+            let cumulative = 0;
+            illuPaths = subpathStrings.map(sub => {
+                const pathEl = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                pathEl.setAttribute("d", sub.trim());
+                pathEl.setAttribute("fill", "none");
+                pathEl.setAttribute("stroke", stroke);
+                pathEl.setAttribute("stroke-width", strokeWidth);
+                svgEl.appendChild(pathEl);
+
+                const len = pathEl.getTotalLength();
+                pathEl.style.strokeDasharray = len;
+                pathEl.style.strokeDashoffset = len;
+
+                const entry = { el: pathEl, length: len, start: cumulative };
+                cumulative += len;
+                return entry;
+            });
+
+            illuTotalLength = cumulative;
+        });
+
     // ──── rAF animation loop ────
     const scrollyEl = document.getElementById("scrolly");
     let animationId = null;
@@ -321,6 +362,21 @@ d3.csv("data/fertility-rate.csv", d3.autoType).then(data => {
 
         const [y0, y1] = lerpDomain(progress);
         updateChart(y0, y1);
+
+        if (illuPaths.length) {
+            const drawn = progress * illuTotalLength;
+            for (let p = 0; p < illuPaths.length; p++) {
+                const sub = illuPaths[p];
+                const subDrawn = drawn - sub.start;
+                if (subDrawn <= 0) {
+                    sub.el.style.strokeDashoffset = sub.length;
+                } else if (subDrawn >= sub.length) {
+                    sub.el.style.strokeDashoffset = 0;
+                } else {
+                    sub.el.style.strokeDashoffset = sub.length - subDrawn;
+                }
+            }
+        }
 
         if (isAnimating) {
             animationId = requestAnimationFrame(animate);
