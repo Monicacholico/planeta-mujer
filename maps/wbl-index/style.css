@@ -43,8 +43,18 @@
     height: 100vh;
     align-self: flex-start;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+}
+
+#map-container {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 0;
 }
 
 .sticky-map svg {
@@ -149,7 +159,136 @@
     color: #f0c040;
 }
 
+/* ── Back to Top ── */
+
+.back-to-top {
+    position: sticky;
+    bottom: 2rem;
+    display: block;
+    margin: 0 auto;
+    padding: 0.5rem 1.2rem;
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    font-size: 0.82rem;
+    font-family: inherit;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    z-index: 50;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease, color 0.3s;
+}
+
+.back-to-top.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.back-to-top:hover {
+    color: var(--color-white);
+}
+
+/* ── Step Countries (mobile/tablet inline list) ── */
+
+.step-countries {
+    display: none;
+}
+
+/* ── Country Panel ── */
+
+.country-panel {
+    flex: 0 0 auto;
+    width: 95%;
+    max-height: 22vh;
+    overflow-y: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 0.6rem 0.4rem;
+    justify-content: center;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.15) transparent;
+}
+
+.country-panel::-webkit-scrollbar {
+    height: 4px;
+    width: 4px;
+}
+
+.country-panel::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.15);
+    border-radius: 2px;
+}
+
+.country-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: rgba(20, 23, 34, 0.85);
+    border-left: 3px solid var(--chip-color, #888);
+    font-size: 0.68rem;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.3s ease, transform 0.3s ease, background 0.2s;
+}
+
+.country-chip.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.country-chip .chip-score {
+    font-weight: 600;
+    color: var(--chip-color, #f0c040);
+}
+
+.country-chip:hover {
+    background: rgba(40, 46, 65, 0.95);
+}
+
+.country-panel-label {
+    width: 100%;
+    text-align: center;
+    font-size: 0.72rem;
+    color: var(--color-text-muted);
+    padding-bottom: 0.3rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.country-panel-label.is-visible {
+    opacity: 1;
+}
+
 /* ── Responsive ── */
+
+@media (max-width: 1024px) {
+    .country-panel {
+        display: none;
+    }
+
+    .step-countries {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 0.8rem;
+        padding-top: 0.6rem;
+        border-top: 1px solid var(--color-border);
+    }
+
+    .step-countries .country-chip {
+        opacity: 1;
+        transform: none;
+    }
+}
 
 @media (max-width: 768px) {
     .piece-header {
@@ -175,5 +314,14 @@
 
     .step {
         margin-bottom: 50vh;
+    }
+
+    .back-to-top {
+        display: none;
+    }
+
+    .step-countries .country-chip {
+        font-size: 0.62rem;
+        padding: 2px 6px;
     }
 }

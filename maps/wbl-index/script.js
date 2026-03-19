@@ -200,6 +200,40 @@ Promise.all([
         }
     });
 
+    // ── Country Panel ──
+    const countryPanel = d3.select("#country-panel");
+
+    function updateCountryPanel(regionName) {
+        countryPanel.selectAll("*").remove();
+
+        const rBubbles = regionBubbles[regionName] || [];
+        if (rBubbles.length === 0) return;
+
+        const sorted = [...rBubbles].sort((a, b) => b.row.wbl_index - a.row.wbl_index);
+
+        const stepEl = document.querySelector(`.step[data-region="${regionName}"].is-active`);
+        const labelText = stepEl ? stepEl.querySelector("h2").textContent : "Countries";
+
+        countryPanel.append("div")
+            .attr("class", "country-panel-label")
+            .text(`${labelText} — ${sorted.length} countries`);
+
+        sorted.forEach((d, i) => {
+            const color = colorScale(d.row.wbl_index);
+            countryPanel.append("div")
+                .attr("class", "country-chip")
+                .attr("data-economy", d.row.economy)
+                .style("--chip-color", color)
+                .style("transition-delay", `${Math.min(i * 25, 600)}ms`)
+                .html(`<span>${d.row.economy}</span><span class="chip-score">${d.row.wbl_index}</span>`);
+        });
+
+        requestAnimationFrame(() => {
+            countryPanel.selectAll(".country-panel-label").classed("is-visible", true);
+            countryPanel.selectAll(".country-chip").classed("is-visible", true);
+        });
+    }
+
     // ── Scrollama ──
     const scroller = scrollama();
 
@@ -211,15 +245,13 @@ Promise.all([
         .onStepEnter((response) => {
             const region = response.element.dataset.region;
 
-            // Highlight active step, dim others
             d3.selectAll(".step").classed("is-active", false);
             d3.select(response.element).classed("is-active", true);
 
-            // Zoom map to the region
             zoomToRegion(region);
+            updateCountryPanel(region);
         });
 
-    // Handle window resize: Scrollama needs to recalculate positions
     window.addEventListener("resize", scroller.resize);
 
     // ── Tooltip ──
@@ -245,4 +277,71 @@ Promise.all([
     function hideTooltip() {
         tooltip.style("opacity", 0);
     }
+
+    // ── Tap-to-show tooltip (mobile) ──
+    let activeBubble = null;
+
+    svg.on("click", function(event) {
+        if (!event.target.classList.contains("bubble")) {
+            hideTooltip();
+            activeBubble = null;
+        }
+    });
+
+    mapGroup.selectAll(".bubble")
+        .on("click", function(event, d) {
+            event.stopPropagation();
+            if (activeBubble === this) {
+                hideTooltip();
+                activeBubble = null;
+                return;
+            }
+            activeBubble = this;
+            showTooltip(event, d);
+            const rect = this.getBoundingClientRect();
+            tooltip
+                .style("left", (rect.left + rect.width / 2 + 10) + "px")
+                .style("top", (rect.top - 10) + "px");
+        });
+
+    // Show the initial panel for the world view
+    updateCountryPanel("world");
+
+    // ── Populate inline step-countries (for mobile/tablet) ──
+    document.querySelectorAll(".step[data-region]").forEach(stepEl => {
+        const region = stepEl.dataset.region;
+        const container = stepEl.querySelector(".step-countries");
+        if (!container) return;
+
+        const rBubbles = regionBubbles[region] || [];
+        const sorted = [...rBubbles].sort((a, b) => b.row.wbl_index - a.row.wbl_index);
+
+        sorted.forEach(d => {
+            const color = colorScale(d.row.wbl_index);
+            const chip = document.createElement("div");
+            chip.className = "country-chip";
+            chip.style.setProperty("--chip-color", color);
+            chip.innerHTML = `<span>${d.row.economy}</span><span class="chip-score">${d.row.wbl_index}</span>`;
+            container.appendChild(chip);
+        });
+    });
+
+    // ── Back to Top (desktop) ──
+    const backToTopBtn = document.getElementById("back-to-top");
+
+    backToTopBtn.addEventListener("click", () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    const lastStepObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting && entry.boundingClientRect.top < 0) {
+                backToTopBtn.classList.add("is-visible");
+            } else if (entry.isIntersecting) {
+                backToTopBtn.classList.remove("is-visible");
+            }
+        });
+    }, { threshold: 0 });
+
+    lastStepObserver.observe(document.getElementById("last-step"));
 });

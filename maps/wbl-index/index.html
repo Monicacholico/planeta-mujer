@@ -56,49 +56,63 @@
     </header>
 
     <div class="scrolly">
-        <div class="sticky-map" id="map-container"></div>
+        <div class="sticky-map">
+            <div id="map-container"></div>
+            <div id="country-panel" class="country-panel"></div>
+        </div>
 
         <div class="steps">
             <div class="step is-active" data-region="world">
                 <h2>Global Overview</h2>
                 <p>The WBL index scores 190 economies on laws affecting women's economic opportunity, from 0 (most restrictive) to 100 (full equality).</p>
                 <div class="step-stats"></div>
+                <div class="step-countries"></div>
             </div>
 
             <div class="step" data-region="americas">
                 <h2>Americas</h2>
                 <p>From Canada's near-perfect score to ongoing challenges in Central America, the hemisphere shows wide variation in legal gender equality.</p>
                 <div class="step-stats"></div>
+                <div class="step-countries"></div>
             </div>
 
             <div class="step" data-region="europe">
                 <h2>Europe</h2>
                 <p>Western and Northern Europe lead globally, but Eastern Europe and Central Asia show a more mixed picture.</p>
                 <div class="step-stats"></div>
+                <div class="step-countries"></div>
             </div>
 
             <div class="step" data-region="africa">
                 <h2>Africa &amp; Middle East</h2>
                 <p>The region with the widest range — from emerging reformers to economies where women face the most legal barriers.</p>
                 <div class="step-stats"></div>
+                <div class="step-countries"></div>
             </div>
 
             <div class="step" data-region="south-asia">
                 <h2>South &amp; Southeast Asia</h2>
                 <p>A rapidly reforming region — from India's recent legal updates to emerging economies in Southeast Asia.</p>
                 <div class="step-stats"></div>
+                <div class="step-countries"></div>
             </div>
 
             <div class="step" data-region="east-asia">
                 <h2>East Asia &amp; Oceania</h2>
                 <p>Australia and New Zealand score among the highest globally, while East Asian economies show a wide range.</p>
                 <div class="step-stats"></div>
+                <div class="step-countries"></div>
             </div>
 
-            <div class="step" data-region="world">
+            <div class="step" data-region="world" id="last-step">
                 <h2>The Full Picture</h2>
                 <p>Zooming back out — the global gap between the highest and lowest scoring economies remains substantial.</p>
+                <div class="step-countries"></div>
             </div>
+
+            <button class="back-to-top" id="back-to-top" aria-label="Back to top">
+                &uarr; Back to Top
+            </button>
         </div>
     </div>
 
